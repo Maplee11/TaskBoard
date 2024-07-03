@@ -1,28 +1,9 @@
 // eslint-disable-next-line no-unused-vars
 import React, { useState, useEffect, useRef } from 'react';
 import Modal from 'react-modal';
-// import CreateTask from './CreateTask';
+import GetUsrInput from "./GetUsrInput.jsx";
 
 Modal.setAppElement('#root');
-
-const sleep = (ms) => {
-    return new Promise(resolve => setTimeout(resolve, ms));
-};
-
-const GetUsrInput = ({ setUsrInput }) => {
-    const onCloseHandler = (event) => {
-        setUsrInput(event.target.value);
-        // console.log(`Set task name to: ${event.target.value}`);
-    }
-    return (
-        <input
-            type="text"
-            placeholder="请输入任务名"
-            onBlur={onCloseHandler}
-            className="border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-    );
-}
 
 const TaskBoard = () => {
     const [taskList, setTask] = useState({
@@ -68,14 +49,12 @@ const TaskBoard = () => {
     }, [modalIsOpen]);
 
     const addTask = async (listName) => {
-        let new_task_name = await openModal();
+        let newTask_ = await openModal();
 
         setTask((prevTasks) => ({
             ...prevTasks,
-            [listName]: [...prevTasks[listName], new_task_name],
+            [listName]: [...prevTasks[listName], newTask_],
         }));
-        console.log(`Task [${new_task_name}] added to [${listName}]`);
-        setNewTask("");
     };
 
     return (
