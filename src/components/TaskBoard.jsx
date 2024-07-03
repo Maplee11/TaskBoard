@@ -1,7 +1,28 @@
 // eslint-disable-next-line no-unused-vars
 import React, { useState, useEffect, useRef } from 'react';
 import Modal from 'react-modal';
-import CreateTask from './CreateTask';
+// import CreateTask from './CreateTask';
+
+Modal.setAppElement('#root');
+
+const sleep = (ms) => {
+    return new Promise(resolve => setTimeout(resolve, ms));
+};
+
+const GetUsrInput = ({ setUsrInput }) => {
+    const onCloseHandler = (event) => {
+        setUsrInput(event.target.value);
+        // console.log(`Set task name to: ${event.target.value}`);
+    }
+    return (
+        <input
+            type="text"
+            placeholder="请输入任务名"
+            onBlur={onCloseHandler}
+            className="border border-gray-300 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+    );
+}
 
 const TaskBoard = () => {
     const [taskList, setTask] = useState({
@@ -22,7 +43,7 @@ const TaskBoard = () => {
         ],
     });
 
-    const [newTask, setNewTask] = useState('NONE');
+    const [newTask, setNewTask] = useState("");
 
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const modalResolve = useRef(null);
@@ -36,25 +57,25 @@ const TaskBoard = () => {
 
     const closeModal = () => {
         setModalIsOpen(false);
-        setNewTask('new');
     };
 
     // 回调函数会在依赖数组中的值发生变化时被触发
     useEffect(() => {
         if (!modalIsOpen && modalResolve.current) {
-            modalResolve.current();
+            modalResolve.current(newTask);
             modalResolve.current = null;
         }
     }, [modalIsOpen]);
 
     const addTask = async (listName) => {
-        await openModal();
+        let new_task_name = await openModal();
 
         setTask((prevTasks) => ({
             ...prevTasks,
-            [listName]: [...prevTasks[listName], newTask],
+            [listName]: [...prevTasks[listName], new_task_name],
         }));
-        console.log(`Task [${newTask}] added to [${listName}]`);
+        console.log(`Task [${new_task_name}] added to [${listName}]`);
+        setNewTask("");
     };
 
     return (
@@ -77,16 +98,20 @@ const TaskBoard = () => {
                     },
                 }}
             >
-                <h2>Hello</h2>
+                <GetUsrInput setUsrInput={setNewTask} />
+                <br/>
                 <button onClick={closeModal} className="mt-4 px-4 py-2 bg-red-500 text-white rounded">
-                    Close Window
+                    关闭
+                </button>
+                <button onClick={closeModal} className="mt-4 px-4 py-2 bg-green-500 text-white rounded">
+                    保存
                 </button>
             </Modal>
         </div>
     );
 };
 
-const Column = ({ taskList, title, listName, addTaskHandler }) => {
+const Column = ({taskList, title, listName, addTaskHandler}) => {
     return (
         <div className="bg-gray-100 rounded-lg shadow p-4 inline-block min-w-max flex-grow">
             <h2 className="text-xl font-semibold mb-4">{title}</h2>
