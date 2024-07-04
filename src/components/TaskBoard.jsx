@@ -95,9 +95,9 @@ const TasksArea = ({ editMode }) => {
 
     return (
         <div className="flex h-screen p-4 space-x-4">
-            <Column taskList={taskList} title="未开始" listName="todo" addTaskHandler={addTask} editMode={editMode} deleteTaskHandler={deleteTask} moveTaskHandler={moveTask} />
+            <Column taskList={taskList} title="未开始" listName="todo"       addTaskHandler={addTask} editMode={editMode} deleteTaskHandler={deleteTask} moveTaskHandler={moveTask} />
             <Column taskList={taskList} title="执行中" listName="undergoing" addTaskHandler={addTask} editMode={editMode} deleteTaskHandler={deleteTask} moveTaskHandler={moveTask} />
-            <Column taskList={taskList} title="已完成" listName="done" addTaskHandler={addTask} editMode={editMode} deleteTaskHandler={deleteTask} moveTaskHandler={moveTask} />
+            <Column taskList={taskList} title="已完成" listName="done"       addTaskHandler={addTask} editMode={editMode} deleteTaskHandler={deleteTask} moveTaskHandler={moveTask} />
 
             <Modal
                 isOpen={modalIsOpen}
@@ -174,7 +174,8 @@ const TaskCard = ({ taskName, editMode, listName, index, deleteTaskHandler }) =>
     });
 
     return (
-        <div ref={drag} className={`bg-white p-4 rounded-lg shadow relative ${isDragging ? 'opacity-50' : ''}`}>
+        //w-full bg-red-500 font-bold text-1xl text-white py-2 rounded-lg
+        <div ref={drag} style={{backgroundColor: "#83ccd2"}} className={`bg=#3f72af p-4 rounded-lg shadow relative ${isDragging ? 'opacity-50' : ''}`}>
             {editMode && (
                 <button
                     name="close"
