@@ -46,13 +46,13 @@ const TaskBoard = () => {
     const createBackup = () => {
         clearAllBanner();
         setCreateBackupBanner(true);
-        setTimeout(() => setCreateBackupBanner(false), 3000);
+        setTimeout(() => setCreateBackupBanner(false), 1000);
     }
 
     const loadBackup = () => {
         clearAllBanner();
         setLoadBackupBanner(true);
-        setTimeout(() => setLoadBackupBanner(false), 3000);
+        setTimeout(() => setLoadBackupBanner(false), 1000);
     }
 
     useEffect(() => {
@@ -68,12 +68,16 @@ const TaskBoard = () => {
     return (
         <div>
             {createBackupBanner && (
-                <div className="fixed top-0 left-0 w-full bg-green-500 text-white py-2 px-4 shadow-lg flex justify-center items-center z-50">
+                <div
+                    className={`absolute top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white py-2 px-4 shadow-lg rounded-lg flex justify-center items-center z-50 transition-transform duration-300 ease-in-out ${createBackupBanner ? 'animate-slide-down' : 'animate-slide-up'}`}
+                >
                     备份已创建
                 </div>
             )}
             {loadBackupBanner && (
-                <div className="fixed top-0 left-0 w-full bg-fuchsia-400 text-white py-2 px-4 shadow-lg flex justify-center items-center z-50">
+                <div
+                    className={`absolute top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white py-2 px-4 shadow-lg rounded-lg flex justify-center items-center z-50 transition-transform duration-300 ease-in-out ${loadBackupBanner ? 'animate-slide-down' : 'animate-slide-up'}`}
+                >
                     备份已加载
                 </div>
             )}
