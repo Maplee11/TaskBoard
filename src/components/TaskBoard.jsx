@@ -3,6 +3,7 @@ import Modal from 'react-modal';
 import GetUsrInput from "./GetUsrInput.jsx";
 import { useDrag, useDrop } from 'react-dnd';
 import axios from 'axios';
+import Accounts from "./Accounts.jsx";
 
 const client = axios.default;
 
@@ -19,14 +20,6 @@ const TaskBoard = () => {
     const [taskList, setTask] = useState({todo: [], undergoing: [], done: []});
     const [createBackupBanner, setCreateBackupBanner] = useState(false);
     const [loadBackupBanner, setLoadBackupBanner] = useState(false);
-    const [isInitialized, setInitialize] = useState(false);
-
-
-    const getExampleTaskList = () => {
-        client.get(backendUrl + "/task/getExample").then((response) => {
-            setTask(response.data);
-        })
-    }
 
     const getUsrTaskList = () => {
         client.get(backendUrl + "/task/getUsrTaskList").then((response) => {
@@ -34,9 +27,7 @@ const TaskBoard = () => {
         })
     }
 
-    const saveUsrTask = () => {
-        client.post(backendUrl + "/task/save", taskList);
-    }
+
 
     const clearAllBanner = () => {
         setCreateBackupBanner(false);
@@ -54,16 +45,6 @@ const TaskBoard = () => {
         setLoadBackupBanner(true);
         setTimeout(() => setLoadBackupBanner(false), 1000);
     }
-
-    useEffect(() => {
-        if(isInitialized === false){
-            setInitialize(true);
-            getUsrTaskList()
-        }
-        else{
-            saveUsrTask();
-        }
-    }, [taskList]);
 
     return (
         <div>
@@ -93,6 +74,9 @@ const TaskBoard = () => {
             <button onClick={loadBackup} className="mt-4 px-4 py-2 bg-fuchsia-400 text-white rounded">
                 加载备份
             </button>
+            <br/>
+            <br/>
+            <Accounts setTask={setTask} backendUrl={backendUrl} getUsrTaskList={getUsrTaskList} taskList={taskList}/>
             <TasksArea editMode={editMode} setTask={setTask} taskList={taskList}/>
         </div>
     );
@@ -170,7 +154,7 @@ const TasksArea = ({editMode, setTask, taskList}) => {
                 }}
             >
                 <div className="flex flex-wrap justify-center">
-                    <GetUsrInput setUsrInput={setNewTask}/>
+                    <GetUsrInput setUsrInput={setNewTask} placeholder={"请输入任务名"}/>
                     <br/>
                     <button onClick={closeModal} className="mt-4 px-4 py-2 bg-red-500 text-white rounded">
                         取消
