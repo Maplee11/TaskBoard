@@ -4,6 +4,7 @@ import GetUsrInput from "./GetUsrInput.jsx";
 import { useDrag, useDrop } from 'react-dnd';
 import axios from 'axios';
 import Accounts from "./Accounts.jsx";
+import Project from "./Project.jsx";
 
 const client = axios.default;
 
@@ -20,13 +21,10 @@ const TaskBoard = () => {
     const [taskList, setTask] = useState({todo: [], undergoing: [], done: []});
     const [createBackupBanner, setCreateBackupBanner] = useState(false);
     const [loadBackupBanner, setLoadBackupBanner] = useState(false);
-
-    const getUsrTaskList = () => {
-        client.get(backendUrl + "/task/getUsrTaskList").then((response) => {
-            setTask(response.data);
-        })
-    }
-
+    const [isInitialized, setInitialize] = useState(false);
+    const [projectName, setProjectName] = useState("示例项目");
+    const [currentUsr, setCurrentUsr] = useState("");
+    const [logged, setLogged] = useState(false);
 
 
     const clearAllBanner = () => {
@@ -76,12 +74,15 @@ const TaskBoard = () => {
             </button>
             <br/>
             <br/>
-            <Accounts setTask={setTask} backendUrl={backendUrl} getUsrTaskList={getUsrTaskList} taskList={taskList}/>
+            <Accounts setLogged={setLogged} setTask={setTask} backendUrl={backendUrl} taskList={taskList} isInitialized={isInitialized} setInitialize={setInitialize} currentUsr={currentUsr} setCurrentUsr={setCurrentUsr} projectName={projectName}/>
+            <br/>
+            {logged && <Project setProjectName={setProjectName} setTask={setTask} backendUrl={backendUrl} taskList={taskList}  projectName={projectName} isInitialized={isInitialized} setInitialize={setInitialize} currentUsr={currentUsr} setCurrentUsr={setCurrentUsr}/>}
             <TasksArea editMode={editMode} setTask={setTask} taskList={taskList}/>
         </div>
     );
 }
 
+// eslint-disable-next-line react/prop-types
 const TasksArea = ({editMode, setTask, taskList}) => {
     const [newTask, setNewTask] = useState("");
     const [modalIsOpen, setModalIsOpen] = useState(false);

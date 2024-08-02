@@ -1,23 +1,21 @@
 import React, {useState, useRef, useEffect} from 'react';
 import Modal from 'react-modal';
 import GetUsrInput from "./GetUsrInput.jsx";
-import { useDrag, useDrop } from 'react-dnd';
 import axios from 'axios';
 
 const client = axios.default;
 
 // eslint-disable-next-line react/prop-types
-const Accounts = ({setTask, backendUrl, getUsrTaskList, taskList}) => {
+const Accounts = ({setLogged, setTask, backendUrl, taskList, setInitialize, isInitialized, currentUsr, setCurrentUsr, projectName}) => {
     const [loginWindowIsOpen, setLoginWindowIsOpen] = useState(false);
     const [usrName, setUsrName] = useState("");
     const [password, setPassword] = useState("");
-    const [isInitialized, setInitialize] = useState(false);
-    const [currentUsr, setCurrentUsr] = useState("");
 
     const saveUsrTask = () => {
         let data = {
             taskList: taskList,
             usrName: currentUsr,
+            projectName: projectName,
         }
         client.post(backendUrl + "/task/save", data);
     }
@@ -31,6 +29,7 @@ const Accounts = ({setTask, backendUrl, getUsrTaskList, taskList}) => {
             setTask(response.data);
             setInitialize(true);
             setCurrentUsr(usrName);
+            setLogged(true);
         })
     }
 
@@ -44,6 +43,7 @@ const Accounts = ({setTask, backendUrl, getUsrTaskList, taskList}) => {
                 setTask(response.data.taskList);
                 setCurrentUsr(usrName);
                 setInitialize(true);
+                setLogged(true);
             }
         })
     }
@@ -51,6 +51,7 @@ const Accounts = ({setTask, backendUrl, getUsrTaskList, taskList}) => {
     const logout = () => {
         setInitialize(false);
         setCurrentUsr("");
+        setLogged(false);
         setTask({
             todo: [],
             undergoing: [],
@@ -84,11 +85,6 @@ const Accounts = ({setTask, backendUrl, getUsrTaskList, taskList}) => {
                     <GetUsrInput setUsrInput={setPassword} placeholder={"密码"}/>
                     <br/>
                     <button onClick={() => {
-                        setLoginWindowIsOpen(false)
-                    }} className="mt-4 px-4 py-2 bg-red-500 text-white rounded">
-                        取消
-                    </button>
-                    <button onClick={() => {
                         setLoginWindowIsOpen(false);
                         tryLogin();
                     }} className="mt-4 px-4 py-2 bg-green-500 text-white rounded">
@@ -99,6 +95,11 @@ const Accounts = ({setTask, backendUrl, getUsrTaskList, taskList}) => {
                         createNewAccount();
                     }} className="mt-4 px-4 py-2 bg-orange-500 text-white rounded">
                         注册
+                    </button>
+                    <button onClick={() => {
+                        setLoginWindowIsOpen(false)
+                    }} className="mt-4 px-4 py-2 bg-red-500 text-white rounded">
+                        取消
                     </button>
                 </div>
             </Modal>
