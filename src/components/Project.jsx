@@ -9,6 +9,16 @@ const client = axios.default;
 const Project = ({setTask, backendUrl, taskList, projectName, setProjectName, setInitialize, isInitialized, currentUsr, setCurrentUsr}) => {
     const [switchWindowIsOpen, setSwitchWindowIsOpen] = useState(false);
     const [newProjectName, setNewProjectName] = useState("");
+    const [projectList, setProjectList] = useState(["DS", "ab"]);
+
+    const downloadProjectList = () => {
+        let data = {
+            usrName: currentUsr,
+        }
+        client.post(backendUrl + "/project/download", data).then((response) => {
+            setProjectList(response.data);
+        })
+    }
 
     const switchProject = () => {
         let data = {
@@ -40,27 +50,6 @@ const Project = ({setTask, backendUrl, taskList, projectName, setProjectName, se
         })
     }
 
-    const tryLogin = () => {
-        let data = {
-            projectName: projectName,
-        };
-        client.post(backendUrl + "/accounts/login", data).then((response) => {
-            if(response.data.message !== "fail"){
-                setTask(response.data.taskList);
-                setProjectName(projectName);
-            }
-        })
-    }
-
-    const logout = () => {
-        setProjectName("");
-        setTask({
-            todo: [],
-            undergoing: [],
-            done: []
-        });
-    }
-
     return (
         <div>
             <Modal
@@ -73,23 +62,33 @@ const Project = ({setTask, backendUrl, taskList, projectName, setProjectName, se
                         bottom: 'auto',
                         marginRight: '-50%',
                         transform: 'translate(-50%, -50%)',
+                        backgroundColor: 'black',
+                        borderRadius: '12px',
                     },
                 }}
             >
-                <div className="justify-center">
-                    <GetUsrInput setUsrInput={setNewProjectName} placeholder={"项目名"}/>
+                <p className="text-2xl text-white">
+                    已创建的项目:
+                </p>
+                <div className="justify-center text-cyan-600">
+                    {projectList.map((project, index) => (
+                        <div key={index} style={{marginBottom: '10px'}}>
+                            {project}
+                        </div>
+                    ))}
+                    <GetUsrInput setUsrInput={setNewProjectName} placeholder={"请输入目标项目名"}/>
                     <br/>
+                    <button onClick={() => {
+                        setSwitchWindowIsOpen(false);
+                        createNewProject();
+                    }} className="mt-4 px-4 py-2 bg-orange-500 text-white rounded">
+                        创建该项目
+                    </button>
                     <button onClick={() => {
                         setSwitchWindowIsOpen(false);
                         switchProject();
                     }} className="mt-4 px-4 py-2 bg-green-500 text-white rounded">
                         切换到该项目
-                    </button>
-                    <button onClick={() => {
-                        setSwitchWindowIsOpen(false);
-                        createNewProject();
-                    }} className="mt-4 px-4 py-2 bg-orange-500 text-white rounded">
-                        创建项目
                     </button>
                     <button onClick={() => {
                         setSwitchWindowIsOpen(false)
@@ -100,12 +99,13 @@ const Project = ({setTask, backendUrl, taskList, projectName, setProjectName, se
             </Modal>
 
             <button onClick={() => {
-                setSwitchWindowIsOpen(true)
+                setSwitchWindowIsOpen(true);
+                downloadProjectList();
             }} className="bg-orange-500">
-                切换项目
+                项目设置
             </button>
             <br/>
-            <p className={`text-lg font-semibold text-orange-500`}>
+            <p className={`font-semibold text-white`}>
                 当前项目: {projectName}
             </p>
         </div>

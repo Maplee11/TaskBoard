@@ -62,14 +62,14 @@ const TaskBoard = () => {
             )}
             <button
                 onClick={() => setEditMode(!editMode)}
-                className="mt-4 px-4 py-2 bg-blue-400 text-white rounded"
+                className="mt-4 px-4 py-2 bg-blue-800 text-white rounded"
             >
                 {editMode ? "退出编辑" : "编辑模式"}
             </button>
-            <button onClick={createBackup} className="mt-4 px-4 py-2 bg-green-500 text-white rounded">
+            <button onClick={createBackup} className="mt-4 px-4 py-2 bg-green-800 text-white rounded">
                 创建备份
             </button>
-            <button onClick={loadBackup} className="mt-4 px-4 py-2 bg-fuchsia-400 text-white rounded">
+            <button onClick={loadBackup} className="mt-4 px-4 py-2 bg-fuchsia-800 text-white rounded">
                 加载备份
             </button>
             <br/>
@@ -151,20 +151,22 @@ const TasksArea = ({editMode, setTask, taskList}) => {
                         bottom: 'auto',
                         marginRight: '-50%',
                         transform: 'translate(-50%, -50%)',
+                        backgroundColor: 'black',
+                        borderRadius: '12px',
                     },
                 }}
             >
-                <div className="flex flex-wrap justify-center">
+                <div className="flex-wrap justify-center">
                     <GetUsrInput setUsrInput={setNewTask} placeholder={"请输入任务名"}/>
                     <br/>
-                    <button onClick={closeModal} className="mt-4 px-4 py-2 bg-red-500 text-white rounded">
-                        取消
-                    </button>
                     <button onClick={() => {
                         save2newTask();
                         closeModal();
-                    }} className="mt-4 px-4 py-2 bg-green-500 text-white rounded">
+                    }} className="mt-4 px-8 py-2 bg-green-500 text-white rounded">
                         保存
+                    </button>
+                    <button onClick={closeModal} className="px-8 py-2 bg-red-500 text-white rounded">
+                        取消
                     </button>
                 </div>
             </Modal>
@@ -172,7 +174,8 @@ const TasksArea = ({editMode, setTask, taskList}) => {
     );
 };
 
-const Column = ({taskList, title, listName, addTaskHandler, editMode, deleteTaskHandler, moveTaskHandler }) => {
+// eslint-disable-next-line react/prop-types
+const Column = ({taskList, title, listName, addTaskHandler, editMode, deleteTaskHandler, moveTaskHandler}) => {
     const [, drop] = useDrop({
         accept: ItemTypes.TASK,
         drop: (item, monitor) => {
@@ -188,15 +191,15 @@ const Column = ({taskList, title, listName, addTaskHandler, editMode, deleteTask
     });
 
     return (
-        <div ref={drop} className="bg-gray-100 rounded-lg shadow p-4 inline-block min-w-max flex-grow">
-            <h2 className="mb-1.5 w-full bg-red-500 font-bold text-1xl text-white py-2 rounded-lg px-36">{title}</h2>
+        <div ref={drop} className="bg-gradient-to-l rounded-lg shadow p-4 inline-block min-w-max flex-grow">
+            <h2 className="mb-1.5 w-full bg-red-700 font-bold text-1xl text-white py-2 rounded-lg px-36">{title}</h2>
             <div className="space-y-2">
                 {taskList[listName].map((taskName, index) => (
                     <TaskCard key={index} taskName={taskName} editMode={editMode} listName={listName} index={index}
                               deleteTaskHandler={() => deleteTaskHandler(listName, index)}/>
                 ))}
                 <button
-                    className="w-full bg-green-500 text-white py-2 rounded-lg"
+                    className="w-full bg-green-700 text-white py-2 rounded-lg"
                     onClick={() => addTaskHandler(listName)}
                 >
                     + 添加卡片
@@ -207,6 +210,7 @@ const Column = ({taskList, title, listName, addTaskHandler, editMode, deleteTask
 };
 
 
+// eslint-disable-next-line react/prop-types
 const TaskCard = ({taskName, editMode, listName, index, deleteTaskHandler}) => {
     const [{ isDragging }, drag] = useDrag({
         type: ItemTypes.TASK,
@@ -218,17 +222,26 @@ const TaskCard = ({taskName, editMode, listName, index, deleteTaskHandler}) => {
 
     return (
         //w-full bg-red-500 font-bold text-1xl text-white py-2 rounded-lg
-        <div ref={drag} style={{backgroundColor: "#83ccd2"}} className={`bg=#3f72af p-4 rounded-lg shadow relative ${isDragging ? 'opacity-50' : ''}`}>
+        <div ref={drag}
+             className={`bg-sky-700 p-4 rounded-lg shadow relative ${isDragging ? 'opacity-50' : ''}`}>
             {editMode && (
                 <button
                     name="close"
-                    className="absolute top-0 right-0 bg-red-500 text-white rounded-full flex items-center justify-center"
-                    style={{ width: '15px', height: '15px', fontSize: '8px' }}
+                    className="absolute top-0 left-0 bg-red-500 text-white rounded-full flex items-center justify-center"
+                    style={{width: '15px', height: '15px', fontSize: '8px'}}
                     onClick={deleteTaskHandler}
                 >
                     x
                 </button>
             )}
+            <button
+                className="text-2xl px-4 py-2 absolute top-0 right-0 text-white bg-sky-700 flex items-center justify-center"
+                onClick={() => {
+                    console.log("abc");
+                }}
+            >
+                {">"}
+            </button>
             {taskName}
         </div>
     );

@@ -51,6 +51,8 @@ const Accounts = ({setLogged, setTask, backendUrl, taskList, setInitialize, isIn
     const logout = () => {
         setInitialize(false);
         setCurrentUsr("");
+        setUsrName("");
+        setPassword("");
         setLogged(false);
         setTask({
             todo: [],
@@ -77,11 +79,15 @@ const Accounts = ({setLogged, setTask, backendUrl, taskList, setInitialize, isIn
                         bottom: 'auto',
                         marginRight: '-50%',
                         transform: 'translate(-50%, -50%)',
+                        backgroundColor: 'black',
+                        borderRadius: '12px',
                     },
                 }}
             >
-                <div className="flex flex-wrap justify-center">
+                <div className="flex-wrap justify-center">
                     <GetUsrInput setUsrInput={setUsrName} placeholder={"用户名"}/>
+                    <br/>
+                    <br/>
                     <GetUsrInput setUsrInput={setPassword} placeholder={"密码"}/>
                     <br/>
                     <button onClick={() => {
@@ -106,14 +112,14 @@ const Accounts = ({setLogged, setTask, backendUrl, taskList, setInitialize, isIn
 
             {((currentUsr === "") && <button onClick={() => {
                 setLoginWindowIsOpen(true)
-            }} className="bg-green-500">
+            }} className="bg-green-800">
                 登录
             </button>)}
-            {(currentUsr !== "") && (<button onClick={logout} className="bg-red-300">
+            {(currentUsr !== "") && (<button onClick={logout} className="bg-red-800">
                 退出登录
             </button>)}
             <br/>
-            <p className={`text-lg font-semibold ${currentUsr === "" ? "text-red-500" : "text-green-300"}`}>
+            <p className={`font-semibold ${currentUsr === "" ? "text-red-800" : "text-white"}`}>
                 当前用户: {currentUsr === "" ? "游客" : currentUsr}
             </p>
         </div>
