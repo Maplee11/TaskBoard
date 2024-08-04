@@ -6,7 +6,7 @@ import axios from 'axios';
 const client = axios.default;
 
 // eslint-disable-next-line react/prop-types
-const Accounts = ({setLogged, setTask, backendUrl, taskList, setInitialize, isInitialized, currentUsr, setCurrentUsr, projectName}) => {
+const Accounts = ({setProjectName, setLogged, setTask, backendUrl, taskList, setInitialize, isInitialized, currentUsr, setCurrentUsr, projectName}) => {
     const [loginWindowIsOpen, setLoginWindowIsOpen] = useState(false);
     const [usrName, setUsrName] = useState("");
     const [password, setPassword] = useState("");
@@ -48,12 +48,18 @@ const Accounts = ({setLogged, setTask, backendUrl, taskList, setInitialize, isIn
         })
     }
 
-    const logout = () => {
+    async function logout() {
         setInitialize(false);
+
         setCurrentUsr("");
         setUsrName("");
         setPassword("");
         setLogged(false);
+        setProjectName("示例项目");
+
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        console.log(isInitialized);
         setTask({
             todo: [],
             undergoing: [],

@@ -5,6 +5,7 @@ import { useDrag, useDrop } from 'react-dnd';
 import axios from 'axios';
 import Accounts from "./Accounts.jsx";
 import Project from "./Project.jsx";
+import {data} from "autoprefixer";
 
 const client = axios.default;
 
@@ -74,16 +75,16 @@ const TaskBoard = () => {
             </button>
             <br/>
             <br/>
-            <Accounts setLogged={setLogged} setTask={setTask} backendUrl={backendUrl} taskList={taskList} isInitialized={isInitialized} setInitialize={setInitialize} currentUsr={currentUsr} setCurrentUsr={setCurrentUsr} projectName={projectName}/>
+            <Accounts setProjectName={setProjectName} setLogged={setLogged} setTask={setTask} backendUrl={backendUrl} taskList={taskList} isInitialized={isInitialized} setInitialize={setInitialize} currentUsr={currentUsr} setCurrentUsr={setCurrentUsr} projectName={projectName}/>
             <br/>
             {logged && <Project setProjectName={setProjectName} setTask={setTask} backendUrl={backendUrl} taskList={taskList}  projectName={projectName} isInitialized={isInitialized} setInitialize={setInitialize} currentUsr={currentUsr} setCurrentUsr={setCurrentUsr}/>}
-            <TasksArea editMode={editMode} setTask={setTask} taskList={taskList}/>
+            <TasksArea currentUsr={currentUsr} projectName={projectName} editMode={editMode} setTask={setTask} taskList={taskList}/>
         </div>
     );
 }
 
 // eslint-disable-next-line react/prop-types
-const TasksArea = ({editMode, setTask, taskList}) => {
+const TasksArea = ({editMode, currentUsr, projectName, setTask, taskList}) => {
     const [newTask, setNewTask] = useState("");
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const modalResolve = useRef(null);
@@ -134,11 +135,11 @@ const TasksArea = ({editMode, setTask, taskList}) => {
 
     return (
         <div className="flex h-screen p-4 space-x-4">
-            <Column taskList={taskList} title="未开始" listName="todo" addTaskHandler={addTask} editMode={editMode}
+            <Column currentUsr={currentUsr} projectName={projectName} taskList={taskList} title="未开始" listName="todo" addTaskHandler={addTask} editMode={editMode}
                     deleteTaskHandler={deleteTask} moveTaskHandler={moveTask}/>
-            <Column taskList={taskList} title="执行中" listName="undergoing" addTaskHandler={addTask}
+            <Column currentUsr={currentUsr} projectName={projectName} taskList={taskList} title="执行中" listName="undergoing" addTaskHandler={addTask}
                     editMode={editMode} deleteTaskHandler={deleteTask} moveTaskHandler={moveTask}/>
-            <Column taskList={taskList} title="已完成" listName="done" addTaskHandler={addTask} editMode={editMode}
+            <Column currentUsr={currentUsr} projectName={projectName} taskList={taskList} title="已完成" listName="done" addTaskHandler={addTask} editMode={editMode}
                     deleteTaskHandler={deleteTask} moveTaskHandler={moveTask}/>
 
             <Modal
@@ -175,7 +176,7 @@ const TasksArea = ({editMode, setTask, taskList}) => {
 };
 
 // eslint-disable-next-line react/prop-types
-const Column = ({taskList, title, listName, addTaskHandler, editMode, deleteTaskHandler, moveTaskHandler}) => {
+const Column = ({taskList, currentUsr, projectName, title, listName, addTaskHandler, editMode, deleteTaskHandler, moveTaskHandler}) => {
     const [, drop] = useDrop({
         accept: ItemTypes.TASK,
         drop: (item, monitor) => {
@@ -195,7 +196,7 @@ const Column = ({taskList, title, listName, addTaskHandler, editMode, deleteTask
             <h2 className="mb-1.5 w-full bg-red-700 font-bold text-1xl text-white py-2 rounded-lg px-36">{title}</h2>
             <div className="space-y-2">
                 {taskList[listName].map((taskName, index) => (
-                    <TaskCard key={index} taskName={taskName} editMode={editMode} listName={listName} index={index}
+                    <TaskCard currentUsr={currentUsr} projectName={projectName} key={index} taskName={taskName} editMode={editMode} listName={listName} index={index}
                               deleteTaskHandler={() => deleteTaskHandler(listName, index)}/>
                 ))}
                 <button
@@ -211,7 +212,7 @@ const Column = ({taskList, title, listName, addTaskHandler, editMode, deleteTask
 
 
 // eslint-disable-next-line react/prop-types
-const TaskCard = ({taskName, editMode, listName, index, deleteTaskHandler}) => {
+const TaskCard = ({taskName, editMode, listName, index, deleteTaskHandler, currentUsr, projectName}) => {
     const [{ isDragging }, drag] = useDrag({
         type: ItemTypes.TASK,
         item: { taskName, listName, index },
@@ -220,10 +221,80 @@ const TaskCard = ({taskName, editMode, listName, index, deleteTaskHandler}) => {
         }),
     });
 
+    const [checkTaskCardIsOpen, setCheckTaskCardIsOpen] = useState(false);
+    const [comment, setComment] = useState("");
+    const [commentList, setCommentList] = useState([]);
+
+    const makeComment = () => {
+        if(comment === "")
+            return;
+        let data = {
+            usrName: currentUsr,
+            projectName: projectName,
+            taskName: taskName,
+            comment: comment,
+        }
+        client.post(backendUrl + "/task/addComment", data).then(() => {setComment("");})
+    }
+
+    const getCommentList = () => {
+        let data = {
+            usrName: currentUsr,
+            projectName: projectName,
+            taskName: taskName,
+        }
+        client.post(backendUrl + "/task/getCommentList", data).then((response) => {
+            setCommentList(response.data);
+        })
+    }
+
     return (
         //w-full bg-red-500 font-bold text-1xl text-white py-2 rounded-lg
         <div ref={drag}
-             className={`bg-sky-700 p-4 rounded-lg shadow relative ${isDragging ? 'opacity-50' : ''}`}>
+             className={`bg-sky-700 p-4 rounded-lg shadow relative ${isDragging ? 'opacity-50' : ''}`}
+        >
+            <Modal
+                isOpen={checkTaskCardIsOpen}
+                style={{
+                    content: {
+                        top: '50%',
+                        left: '50%',
+                        right: 'auto',
+                        bottom: 'auto',
+                        marginRight: '-50%',
+                        transform: 'translate(-50%, -50%)',
+                        backgroundColor: 'black',
+                        borderRadius: '12px',
+                    },
+                }}
+            >
+                <p className="text-2xl text-white">
+                    评论区
+                </p>
+                <br/>
+                <div className="flex-wrap justify-center text-cyan-600">
+                    {commentList.map((commentContent, index) => (
+                        <div key={index} style={{marginBottom: '10px'}}>
+                            {commentContent}
+                        </div>
+                    ))}
+                    <GetUsrInput setUsrInput={setComment} placeholder={"请输入评论"}/>
+                    <br/>
+                    <button onClick={() => {
+                        makeComment();
+                        setCheckTaskCardIsOpen(false);
+                    }} className="mt-4 px-6 py-2 bg-green-500 text-white rounded">
+                        发表评论
+                    </button>
+                    <button onClick={() => {
+                        setComment("");
+                        setCheckTaskCardIsOpen(false);
+                    }} className="px-8 py-2 bg-red-500 text-white rounded">
+                        取消
+                    </button>
+                </div>
+            </Modal>
+
             {editMode && (
                 <button
                     name="close"
@@ -237,12 +308,15 @@ const TaskCard = ({taskName, editMode, listName, index, deleteTaskHandler}) => {
             <button
                 className="text-2xl px-4 py-2 absolute top-0 right-0 text-white bg-sky-700 flex items-center justify-center"
                 onClick={() => {
-                    console.log("abc");
+                    getCommentList();
+                    setCheckTaskCardIsOpen(true);
                 }}
             >
                 {">"}
             </button>
-            {taskName}
+            <p className="font-bold text-1xl">
+                {taskName}
+            </p>
         </div>
     );
 };
