@@ -6,7 +6,7 @@ import axios from 'axios';
 const client = axios.default;
 
 // eslint-disable-next-line react/prop-types
-const Accounts = ({setProjectName, setLogged, setTask, backendUrl, taskList, setInitialize, isInitialized, currentUsr, setCurrentUsr, projectName}) => {
+const Accounts = ({setNewProjectBanner, setLoginSuccessBanner, setProjectName, setLogged, setTask, backendUrl, taskList, setInitialize, isInitialized, currentUsr, setCurrentUsr, projectName}) => {
     const [loginWindowIsOpen, setLoginWindowIsOpen] = useState(false);
     const [usrName, setUsrName] = useState("");
     const [password, setPassword] = useState("");
@@ -30,6 +30,8 @@ const Accounts = ({setProjectName, setLogged, setTask, backendUrl, taskList, set
             setInitialize(true);
             setCurrentUsr(usrName);
             setLogged(true);
+            setNewProjectBanner(true);
+            setTimeout(() => setNewProjectBanner(false), 1000);
         })
     }
 
@@ -44,6 +46,8 @@ const Accounts = ({setProjectName, setLogged, setTask, backendUrl, taskList, set
                 setCurrentUsr(usrName);
                 setInitialize(true);
                 setLogged(true);
+                setLoginSuccessBanner(true);
+                setTimeout(() => setLoginSuccessBanner(false), 1000);
             }
         })
     }

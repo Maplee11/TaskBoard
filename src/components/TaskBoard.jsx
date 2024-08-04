@@ -20,27 +20,22 @@ const backendUrl = "http://192.168.190.1:7001";
 const TaskBoard = () => {
     const [editMode, setEditMode] = useState(false);
     const [taskList, setTask] = useState({todo: [], undergoing: [], done: []});
-    const [createBackupBanner, setCreateBackupBanner] = useState(false);
-    const [loadBackupBanner, setLoadBackupBanner] = useState(false);
     const [isInitialized, setInitialize] = useState(false);
     const [projectName, setProjectName] = useState("示例项目");
     const [currentUsr, setCurrentUsr] = useState("");
     const [logged, setLogged] = useState(false);
-
-
-    const clearAllBanner = () => {
-        setCreateBackupBanner(false);
-        setLoadBackupBanner(false);
-    }
+    const [createBackupBanner, setCreateBackupBanner] = useState(false);
+    const [loadBackupBanner, setLoadBackupBanner] = useState(false);
+    const [loginSuccessBanner, setLoginSuccessBanner] = useState(false);
+    const [newProjectBanner, setNewProjectBanner] = useState(false);
+    const [switchSuccessBanner, setSwitchSuccessBanner] = useState(false);
 
     const createBackup = () => {
-        clearAllBanner();
         setCreateBackupBanner(true);
         setTimeout(() => setCreateBackupBanner(false), 1000);
     }
 
     const loadBackup = () => {
-        clearAllBanner();
         setLoadBackupBanner(true);
         setTimeout(() => setLoadBackupBanner(false), 1000);
     }
@@ -61,6 +56,27 @@ const TaskBoard = () => {
                     备份已加载
                 </div>
             )}
+            {loginSuccessBanner && (
+                <div
+                    className={`absolute top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white py-2 px-4 shadow-lg rounded-lg flex justify-center items-center z-50 transition-transform duration-300 ease-in-out ${loginSuccessBanner ? 'animate-slide-down' : 'animate-slide-up'}`}
+                >
+                    登录成功
+                </div>
+            )}
+            {newProjectBanner && (
+                <div
+                    className={`absolute top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white py-2 px-4 shadow-lg rounded-lg flex justify-center items-center z-50 transition-transform duration-300 ease-in-out ${newProjectBanner ? 'animate-slide-down' : 'animate-slide-up'}`}
+                >
+                    创建成功
+                </div>
+            )}
+            {switchSuccessBanner && (
+                <div
+                    className={`absolute top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white py-2 px-4 shadow-lg rounded-lg flex justify-center items-center z-50 transition-transform duration-300 ease-in-out ${switchSuccessBanner ? 'animate-slide-down' : 'animate-slide-up'}`}
+                >
+                    切换成功
+                </div>
+            )}
             <button
                 onClick={() => setEditMode(!editMode)}
                 className="mt-4 px-4 py-2 bg-blue-800 text-white rounded"
@@ -75,16 +91,16 @@ const TaskBoard = () => {
             </button>
             <br/>
             <br/>
-            <Accounts setProjectName={setProjectName} setLogged={setLogged} setTask={setTask} backendUrl={backendUrl} taskList={taskList} isInitialized={isInitialized} setInitialize={setInitialize} currentUsr={currentUsr} setCurrentUsr={setCurrentUsr} projectName={projectName}/>
+            <Accounts setNewProjectBanner={setNewProjectBanner} setLoginSuccessBanner={setLoginSuccessBanner} setProjectName={setProjectName} setLogged={setLogged} setTask={setTask} backendUrl={backendUrl} taskList={taskList} isInitialized={isInitialized} setInitialize={setInitialize} currentUsr={currentUsr} setCurrentUsr={setCurrentUsr} projectName={projectName}/>
             <br/>
-            {logged && <Project setProjectName={setProjectName} setTask={setTask} backendUrl={backendUrl} taskList={taskList}  projectName={projectName} isInitialized={isInitialized} setInitialize={setInitialize} currentUsr={currentUsr} setCurrentUsr={setCurrentUsr}/>}
-            <TasksArea currentUsr={currentUsr} projectName={projectName} editMode={editMode} setTask={setTask} taskList={taskList}/>
+            {logged && <Project setSwitchSuccessBanner={setSwitchSuccessBanner} setNewProjectBanner={setNewProjectBanner} setProjectName={setProjectName} setTask={setTask} backendUrl={backendUrl} taskList={taskList}  projectName={projectName} isInitialized={isInitialized} setInitialize={setInitialize} currentUsr={currentUsr} setCurrentUsr={setCurrentUsr}/>}
+            <TasksArea setNewProjectBanner={setNewProjectBanner} currentUsr={currentUsr} projectName={projectName} editMode={editMode} setTask={setTask} taskList={taskList}/>
         </div>
     );
 }
 
 // eslint-disable-next-line react/prop-types
-const TasksArea = ({editMode, currentUsr, projectName, setTask, taskList}) => {
+const TasksArea = ({setNewProjectBanner, editMode, currentUsr, projectName, setTask, taskList}) => {
     const [newTask, setNewTask] = useState("");
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const modalResolve = useRef(null);
@@ -101,8 +117,11 @@ const TasksArea = ({editMode, currentUsr, projectName, setTask, taskList}) => {
     };
 
     const save2newTask = () => {
-        if(newTask !== "" && modalResolve.current)
+        if(newTask !== "" && modalResolve.current){
             modalResolve.current(newTask);
+            setNewProjectBanner(true);
+            setTimeout(() => setNewProjectBanner(false), 1000);
+        }
     }
 
     const addTask = async (listName) => {
@@ -224,6 +243,15 @@ const TaskCard = ({taskName, editMode, listName, index, deleteTaskHandler, curre
     const [checkTaskCardIsOpen, setCheckTaskCardIsOpen] = useState(false);
     const [comment, setComment] = useState("");
     const [commentList, setCommentList] = useState([]);
+    const [file, setFile] = useState(null);
+
+    const handleFileChange = (event) => {
+        const selectedFile = event.target.files[0];
+        if (selectedFile) {
+            setFile(selectedFile);
+        }
+        console.log(selectedFile.name);
+    };
 
     const makeComment = () => {
         if(comment === "")
@@ -248,6 +276,23 @@ const TaskCard = ({taskName, editMode, listName, index, deleteTaskHandler, curre
         })
     }
 
+    const uploadAttachment = () => {
+        if(file === null)
+            return;
+
+        const uploadData = new FormData();
+        uploadData.append('file', file);
+        uploadData.append('usrName', currentUsr);
+        uploadData.append('projectName', projectName);
+        uploadData.append('taskName', taskName);
+
+        client.post(backendUrl + "/upload", uploadData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+    }
+
     return (
         //w-full bg-red-500 font-bold text-1xl text-white py-2 rounded-lg
         <div ref={drag}
@@ -268,8 +313,24 @@ const TaskCard = ({taskName, editMode, listName, index, deleteTaskHandler, curre
                     },
                 }}
             >
+                <p className="text-1xl text-orange-500">
+                    任务名称: {taskName}
+                </p>
+                <p className="text-1xl text-orange-500">
+                    所属项目: {projectName}
+                </p>
+                <p className="text-1xl text-orange-500">
+                    创建人: {currentUsr}
+                </p>
+                <br/>
+                <input
+                    type="file"
+                    className="mb-4"
+                    onChange={handleFileChange}
+                />
+                <br/>
                 <p className="text-2xl text-white">
-                    评论区
+                    {"评论区"}
                 </p>
                 <br/>
                 <div className="flex-wrap justify-center text-cyan-600">
@@ -283,13 +344,19 @@ const TaskCard = ({taskName, editMode, listName, index, deleteTaskHandler, curre
                     <button onClick={() => {
                         makeComment();
                         setCheckTaskCardIsOpen(false);
-                    }} className="mt-4 px-6 py-2 bg-green-500 text-white rounded">
+                    }} className="mt-4 px-4 py-2 bg-green-500 text-white rounded">
                         发表评论
+                    </button>
+                    <button onClick={() => {
+                        uploadAttachment();
+                        setCheckTaskCardIsOpen(false);
+                    }} className="mt-4 px-4 py-2 bg-orange-500 text-white rounded">
+                        上传所选附件
                     </button>
                     <button onClick={() => {
                         setComment("");
                         setCheckTaskCardIsOpen(false);
-                    }} className="px-8 py-2 bg-red-500 text-white rounded">
+                    }} className="px-4 py-2 bg-red-500 text-white rounded">
                         取消
                     </button>
                 </div>

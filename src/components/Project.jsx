@@ -6,7 +6,7 @@ import axios from 'axios';
 const client = axios.default;
 
 // eslint-disable-next-line react/prop-types
-const Project = ({setTask, backendUrl, taskList, projectName, setProjectName, setInitialize, isInitialized, currentUsr, setCurrentUsr}) => {
+const Project = ({setSwitchSuccessBanner, setNewProjectBanner, setTask, backendUrl, taskList, projectName, setProjectName, setInitialize, isInitialized, currentUsr, setCurrentUsr}) => {
     const [switchWindowIsOpen, setSwitchWindowIsOpen] = useState(false);
     const [newProjectName, setNewProjectName] = useState("");
     const [projectList, setProjectList] = useState(["DS", "ab"]);
@@ -30,6 +30,8 @@ const Project = ({setTask, backendUrl, taskList, projectName, setProjectName, se
             setTask(response.data);
             setProjectName(newProjectName);
             setInitialize(true);
+            setSwitchSuccessBanner(true);
+            setTimeout(() => setSwitchSuccessBanner(false), 1000);
         })
     }
 
@@ -47,6 +49,8 @@ const Project = ({setTask, backendUrl, taskList, projectName, setProjectName, se
             });
             setProjectName(newProjectName);
             setInitialize(true);
+            setNewProjectBanner(true);
+            setTimeout(() => setNewProjectBanner(false), 1000);
         })
     }
 
