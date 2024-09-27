@@ -15,7 +15,7 @@ const ItemTypes = {
     TASK: 'task',
 };
 
-const backendUrl = "http://192.168.190.1:7001";
+const backendUrl = "http://172.26.91.177:7001";
 
 const TaskBoard = () => {
     const [editMode, setEditMode] = useState(false);
